@@ -10,7 +10,9 @@ const app = express();
 
 app.use(express.json());
 
-createTable();
+createTable().catch((err) => {
+  console.error("Table creation failed:", err);
+});
 
 app.use("/user", router);
 
@@ -18,4 +20,6 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-export default app; // no .listen() here — Vercel handles that
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
