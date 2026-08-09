@@ -9,7 +9,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://google-collab.vercel.app/",
+    
+    origin: "https://google-collab-front-end.vercel.app/",
     credentials: true,
   }),
 );
