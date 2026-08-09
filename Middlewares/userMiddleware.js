@@ -4,7 +4,7 @@ import isEmail from "validator/lib/isEmail.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { sendEmail } from "../utils/mailer.js"; // ad
+import { sendEmail } from "../Utils/mailer.js"; // ad
 
 
 const salt_rounds = 10;
