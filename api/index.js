@@ -1,12 +1,18 @@
 import dotenv from "dotenv";
 dotenv.config();
-
+import cors from "cors";
 import express from "express";
 import router from "../Routes/userRoute.js";
 import { createTable } from "../Schema/appSchema.js";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "https://google-collab.vercel.app/",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 createTable();
@@ -17,4 +23,4 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-export default app; 
+export default app;

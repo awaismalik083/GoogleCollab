@@ -1,12 +1,21 @@
 import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import router from "./Routes/userRoute.js";
 import { createTable } from "./Schema/appSchema.js";
+import cors from "cors";
+
+dotenv.config();
 
 const port = 3000;
 const app = express();
+
+app.use(express.json());
+app.use(
+  cors({
+    origin: "https://google-collab-front-end.vercel.app/",
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
