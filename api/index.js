@@ -6,11 +6,14 @@ import router from "../Routes/userRoute.js";
 import { createTable } from "../Schema/appSchema.js";
 
 const app = express();
+const allowedOrigins = [
+  "https://google-collab-front-end.vercel.app",
+  "http://localhost:3001",
+];
 
 app.use(
   cors({
-    
-    origin: "https://google-collab-front-end.vercel.app",
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
