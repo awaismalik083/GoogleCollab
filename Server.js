@@ -4,6 +4,8 @@ import cors from "cors";
 import express from "express";
 import router from "../backend/Routes/userRoute.js";
 import { createTable } from "../backend/Schema/appSchema.js";
+import noteBookrouter from "./Routes/noteBookRoute.js";
+import noteBookRouter from "./Routes/noteBookRoute.js";
 
 const app = express();
 
@@ -30,6 +32,7 @@ app.use(express.json());
 createTable();
 
 app.use("/user", router);
+app.use("/notebook",noteBookRouter)
 
 app.get("/", (req, res) => {
   res.send("Server is running");

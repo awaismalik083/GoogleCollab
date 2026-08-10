@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import router from "../Routes/userRoute.js";
 import { createTable } from "../Schema/appSchema.js";
+import noteBookRouter from "../Routes/noteBookRoute.js";
 
 const app = express();
 const allowedOrigins = [
@@ -22,6 +23,7 @@ app.use(express.json());
 createTable();
 
 app.use("/user", router);
+app.use("/notebook",noteBookRouter)
 
 app.get("/", (req, res) => {
   res.send("Server is running");

@@ -1,7 +1,7 @@
 
 import { Router } from "express";
-import signup from "../Middlewares/userMiddleware.js";
-import { login, forgotPassword, resetPassword } from "../Middlewares/userMiddleware.js";
+import signup from "../Controllers/userController.js";
+import { login, forgotPassword, resetPassword } from "../Controllers/userController.js";
 
 const router = Router();
 
