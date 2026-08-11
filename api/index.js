@@ -7,6 +7,7 @@ import { createTable } from "../Schema/appSchema.js";
 import noteBookRouter from "../Routes/noteBookRoute.js";
 
 const app = express();
+
 const allowedOrigins = [
   "https://google-collab-front-end.vercel.app",
   "http://localhost:3000",

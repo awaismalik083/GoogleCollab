@@ -13,7 +13,6 @@ const allowedOrigins = [
   "https://google-collab-front-end.vercel.app",
   "http://localhost:3000",
 ];
-
 app.use(
   cors({
     origin: function (origin, callback) {
