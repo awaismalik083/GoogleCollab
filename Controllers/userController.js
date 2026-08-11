@@ -61,17 +61,12 @@ const signup = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
+ 
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
       user,
+      token
     });
   } catch (err) {
     console.error("Signup error:", err.message);
@@ -131,18 +126,12 @@ export const login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
-    res.cookie("token", token, {
-      // added — login was missing this entirely
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
 
     res.status(200).json({
       success: true,
       message: "Login successful",
       user: { id: user.id, username: user.username, email: user.email },
+      token
     });
   } catch (err) {
     console.error("Login error:", err.message);
