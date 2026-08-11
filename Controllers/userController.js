@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendEmail } from "../Utils/mailer.js"; // ad
 
-
 const salt_rounds = 10;
 
 const signup = async (req, res) => {
@@ -62,20 +61,27 @@ const signup = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
       user,
-      token,
     });
   } catch (err) {
     console.error("Signup error:", err.message);
-    res.status(500).json({ success: false, message: "Something went wrong during signup" });
+    res
+      .status(500)
+      .json({ success: false, message: "Something went wrong during signup" });
   }
 };
 
 export default signup;
-
 
 // ---------------- LOGIN ----------------
 export const login = async (req, res) => {
@@ -125,15 +131,24 @@ export const login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
+    res.cookie("token", token, {
+      // added — login was missing this entirely
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       success: true,
       message: "Login successful",
       user: { id: user.id, username: user.username, email: user.email },
-      token,
     });
   } catch (err) {
     console.error("Login error:", err.message);
-    res.status(500).json({ success: false, message: "Something went wrong during login" });
+    res
+      .status(500)
+      .json({ success: false, message: "Something went wrong during login" });
   }
 };
 
@@ -167,7 +182,10 @@ export const forgotPassword = async (req, res) => {
 
     // Generate a raw token to email, and a hashed version to store
     const rawToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await pool.query(
@@ -206,7 +224,9 @@ export const resetPassword = async (req, res) => {
   const { password } = req.body;
 
   if (!token) {
-    return res.status(400).json({ success: false, message: "Reset token is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Reset token is required" });
   }
 
   if (!password || password.length < 6) {
