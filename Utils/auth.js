@@ -2,19 +2,14 @@ import jwt from "jsonwebtoken";
 
 export const authMiddleware = (req, res, next) => {
   try {
-    // Expecting header: Authorization: Bearer <token>
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.token; // changed from req.headers.authorization
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
       return res.status(401).json({ message: "No token provided, access denied" });
     }
 
-    const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // decoded should contain whatever you signed at login, e.g. { id, username, email }
-    req.user = decoded;
+    req.user = decoded; // { id, email } — matches the fixed signup/login payload
 
     next();
   } catch (err) {
