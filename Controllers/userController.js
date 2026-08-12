@@ -269,3 +269,10 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
+
+export const getMe = async (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+};
