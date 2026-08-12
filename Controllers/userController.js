@@ -8,6 +8,15 @@ import { sendEmail } from "../Utils/mailer.js"; // ad
 
 const salt_rounds = 10;
 
+// Shared cookie config — must live outside both signup and login
+// so both functions can reference it. This was the bug causing your 500.
+const COOKIE_OPTIONS = {
+  httpOnly: true, // JS can't read it — blocks XSS token theft
+  secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" if frontend/backend are different domains
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days, matches JWT_EXPIRES_IN
+};
+
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -54,25 +63,19 @@ const signup = async (req, res) => {
     );
 
     const user = result.rows[0];
+
     const token = jwt.sign(
-      { id: user.id, email: user.email }, // ✅ to this
+      { id: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
-    const COOKIE_OPTIONS = {
-      httpOnly: true, // JS can't read it — blocks XSS token theft
-      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" if frontend/backend are different domains
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days, matches JWT_EXPIRES_IN
-    };
-
-    // inside signup, after creating the token:
     res.cookie("token", token, COOKIE_OPTIONS);
+
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
-      user, // no token in the body anymore
+      user, // no token in the body anymore — it's in the httpOnly cookie
     });
   } catch (err) {
     console.error("Signup error:", err.message);
@@ -125,14 +128,15 @@ export const login = async (req, res) => {
         message: "Invalid email or password",
       });
     }
+
     const token = jwt.sign(
-      { id: user.id, email: user.email }, // ✅ to this
+      { id: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
-    // inside login, after creating the token:
     res.cookie("token", token, COOKIE_OPTIONS);
+
     res.status(200).json({
       success: true,
       message: "Login successful",
