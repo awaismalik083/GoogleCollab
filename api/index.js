@@ -5,6 +5,8 @@ import express from "express";
 import router from "../Routes/userRoute.js";
 import { createTable } from "../Schema/appSchema.js";
 import noteBookRouter from "../Routes/noteBookRoute.js";
+import cookieParser from "cookie-parser";
+
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(cookieParser());
 
 createTable();
 
