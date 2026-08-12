@@ -54,19 +54,25 @@ const signup = async (req, res) => {
     );
 
     const user = result.rows[0];
-
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { id: user.id, email: user.email }, // ✅ to this
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
- 
+    const COOKIE_OPTIONS = {
+      httpOnly: true, // JS can't read it — blocks XSS token theft
+      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" if frontend/backend are different domains
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days, matches JWT_EXPIRES_IN
+    };
+
+    // inside signup, after creating the token:
+    res.cookie("token", token, COOKIE_OPTIONS);
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
-      user,
-      token
+      user, // no token in the body anymore
     });
   } catch (err) {
     console.error("Signup error:", err.message);
@@ -119,19 +125,18 @@ export const login = async (req, res) => {
         message: "Invalid email or password",
       });
     }
-
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { id: user.id, email: user.email }, // ✅ to this
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
     );
 
-
+    // inside login, after creating the token:
+    res.cookie("token", token, COOKIE_OPTIONS);
     res.status(200).json({
       success: true,
       message: "Login successful",
       user: { id: user.id, username: user.username, email: user.email },
-      token
     });
   } catch (err) {
     console.error("Login error:", err.message);
