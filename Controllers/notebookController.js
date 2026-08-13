@@ -10,7 +10,7 @@ export const createNotebook = async (req, res) => {
       `INSERT INTO notebooks (user_id, title)
        VALUES ($1, $2)
        RETURNING *`,
-      [userId, title || "Untitled Notebook"]
+      [userId, title || "Untitled Notebook"],
     );
 
     return res.status(201).json({
@@ -19,7 +19,9 @@ export const createNotebook = async (req, res) => {
     });
   } catch (err) {
     console.error("Error creating notebook:", err);
-    return res.status(500).json({ message: "Server error while creating notebook" });
+    return res
+      .status(500)
+      .json({ message: "Server error while creating notebook" });
   }
 };
 
@@ -32,7 +34,7 @@ export const getAllNotebooks = async (req, res) => {
       `SELECT * FROM notebooks
        WHERE user_id = $1
        ORDER BY updated_at DESC`,
-      [userId]
+      [userId],
     );
 
     return res.status(200).json({
@@ -41,7 +43,9 @@ export const getAllNotebooks = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching notebooks:", err);
-    return res.status(500).json({ message: "Server error while fetching notebooks" });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching notebooks" });
   }
 };
 
@@ -53,7 +57,7 @@ export const getNotebookById = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM notebooks WHERE id = $1 AND user_id = $2`,
-      [id, userId]
+      [id, userId],
     );
 
     if (result.rows.length === 0) {
@@ -63,7 +67,9 @@ export const getNotebookById = async (req, res) => {
     return res.status(200).json({ notebook: result.rows[0] });
   } catch (err) {
     console.error("Error fetching notebook:", err);
-    return res.status(500).json({ message: "Server error while fetching notebook" });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching notebook" });
   }
 };
 
@@ -80,7 +86,7 @@ export const updateNotebook = async (req, res) => {
            updated_at = NOW()
        WHERE id = $2 AND user_id = $3
        RETURNING *`,
-      [title, id, userId]
+      [title, id, userId],
     );
 
     if (result.rows.length === 0) {
@@ -93,7 +99,9 @@ export const updateNotebook = async (req, res) => {
     });
   } catch (err) {
     console.error("Error updating notebook:", err);
-    return res.status(500).json({ message: "Server error while updating notebook" });
+    return res
+      .status(500)
+      .json({ message: "Server error while updating notebook" });
   }
 };
 
@@ -105,7 +113,7 @@ export const deleteNotebook = async (req, res) => {
   try {
     const result = await pool.query(
       `DELETE FROM notebooks WHERE id = $1 AND user_id = $2 RETURNING id`,
-      [id, userId]
+      [id, userId],
     );
 
     if (result.rows.length === 0) {
@@ -115,6 +123,37 @@ export const deleteNotebook = async (req, res) => {
     return res.status(200).json({ message: "Notebook deleted successfully" });
   } catch (err) {
     console.error("Error deleting notebook:", err);
-    return res.status(500).json({ message: "Server error while deleting notebook" });
+    return res
+      .status(500)
+      .json({ message: "Server error while deleting notebook" });
+  }
+};
+
+
+export const getUserNotebooks = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT id, title, created_at, updated_at
+      FROM notebooks
+      WHERE user_id = $1
+      ORDER BY updated_at DESC
+      `,
+      [userId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      notebooks: result.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching notebooks:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch notebooks",
+    });
   }
 };
