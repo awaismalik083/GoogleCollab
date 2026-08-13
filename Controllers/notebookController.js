@@ -130,30 +130,3 @@ export const deleteNotebook = async (req, res) => {
 };
 
 
-export const getUserNotebooks = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const result = await pool.query(
-      `
-      SELECT id, title, created_at, updated_at
-      FROM notebooks
-      WHERE user_id = $1
-      ORDER BY updated_at DESC
-      `,
-      [userId]
-    );
-
-    return res.status(200).json({
-      success: true,
-      notebooks: result.rows,
-    });
-  } catch (error) {
-    console.error("Error fetching notebooks:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch notebooks",
-    });
-  }
-};

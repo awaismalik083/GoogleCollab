@@ -16,5 +16,5 @@ noteBookRouter.post("/create", authMiddleware, createNotebook); // POST   /noteb
 noteBookRouter.get("/:id", authMiddleware, getNotebookById); // GET    /notebook/:id
 noteBookRouter.put("/:id", authMiddleware, updateNotebook); // PUT    /notebook/:id
 noteBookRouter.delete("/:id", authMiddleware, deleteNotebook); // DELETE /notebook/:id
-noteBookRouter.post("/get/:id", getAllNotebooks);
+
 export default noteBookRouter;
