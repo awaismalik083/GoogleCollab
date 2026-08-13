@@ -3,14 +3,14 @@ import { pool } from "../Config/db.js";
 // CREATE a new notebook
 export const createNotebook = async (req, res) => {
   const userId = req.user.id; // assumes auth middleware sets req.user
-  const { title, description, icon } = req.body;
+  const { title } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO notebooks (user_id, title, description, icon)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO notebooks (user_id, title)
+       VALUES ($1, $2)
        RETURNING *`,
-      [userId, title || "Untitled Notebook", description || null, icon || null]
+      [userId, title || "Untitled Notebook"]
     );
 
     return res.status(201).json({
@@ -30,7 +30,7 @@ export const getAllNotebooks = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM notebooks
-       WHERE user_id = $1 AND is_archived = FALSE
+       WHERE user_id = $1
        ORDER BY updated_at DESC`,
       [userId]
     );
@@ -67,22 +67,20 @@ export const getNotebookById = async (req, res) => {
   }
 };
 
-// UPDATE a notebook (title, description, icon)
+// UPDATE a notebook (title only)
 export const updateNotebook = async (req, res) => {
   const userId = req.user.id;
   const { id } = req.params;
-  const { title, description, icon } = req.body;
+  const { title } = req.body;
 
   try {
     const result = await pool.query(
       `UPDATE notebooks
        SET title = COALESCE($1, title),
-           description = COALESCE($2, description),
-           icon = COALESCE($3, icon),
            updated_at = NOW()
-       WHERE id = $4 AND user_id = $5
+       WHERE id = $2 AND user_id = $3
        RETURNING *`,
-      [title, description, icon, id, userId]
+      [title, id, userId]
     );
 
     if (result.rows.length === 0) {
